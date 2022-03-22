@@ -18,24 +18,16 @@ class CalculatorViewController: UIViewController {
     }
     
     @IBAction func tipChanged(_ sender: UIButton) {
-        let btnTitle = sender.currentTitle
         
-        if (btnTitle == zeroPctButton.currentTitle) {
-            zeroPctButton.isSelected = true
-            tenPctButton.isSelected = false
-            twentyPctButton.isSelected = false
-            pctChose = 0.0
-        } else if (btnTitle == tenPctButton.currentTitle) {
-            zeroPctButton.isSelected = false
-            tenPctButton.isSelected = true
-            twentyPctButton.isSelected = false
-            pctChose = 0.1
-        } else if (btnTitle == twentyPctButton.currentTitle) {
-            zeroPctButton.isSelected = false
-            tenPctButton.isSelected = false
-            twentyPctButton.isSelected = true
-            pctChose = 0.2
-        }
+        zeroPctButton.isSelected = false
+        tenPctButton.isSelected = false
+        twentyPctButton.isSelected = false
+        sender.isSelected = true
+        
+        let buttonTitle = sender.currentTitle!
+        let buttonTitleMinusPercentSign =  String(buttonTitle.dropLast())
+        let buttonTitleAsANumber = Float(buttonTitleMinusPercentSign)!
+        pctChose = buttonTitleAsANumber / 100
         
         billTextField.endEditing(true)
     }
@@ -45,12 +37,21 @@ class CalculatorViewController: UIViewController {
     }
     
     @IBAction func calculatePressed(_ sender: UIButton) {
-        let totalBill = Float(billTextField.text!)!
-        let nbrPeople = Int(splitNumberLabel.text!)!
-
-        calculatorBrain.calculateBill(total: totalBill, percent: pctChose, nbrPeople: nbrPeople)
         
-        self.performSegue(withIdentifier: "goToResults", sender: self)
+        if billTextField.text != "" {
+            let totalBill = Float(billTextField.text!)!
+            let nbrPeople = Int(splitNumberLabel.text!)!
+            
+            calculatorBrain.calculateBill(total: totalBill, percent: pctChose, nbrPeople: nbrPeople)
+            self.performSegue(withIdentifier: "goToResults", sender: self)
+            
+        } else {
+            let msg = "Please enter the amount of money so we can do the work for you ;)"
+            let alert = UIAlertController(title: "Oops", message: msg, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("Ok bro", comment: "Default action"), style: .default))
+            self.present(alert, animated: true, completion: nil)
+        }
+        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
